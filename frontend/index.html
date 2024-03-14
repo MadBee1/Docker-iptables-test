@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="frontend.js"></script>
+  </head>
+  <body ng-app="myApp" ng-controller="myCtrl" ng-style="{'background-color': color}">
+    <input type="text" ng-model="color" placeholder="Enter a color">
+    <button ng-click="sendColor()">Change Background</button>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+version: '3.8' # Specifies the version of the Compose file format
+services:
+  backend: # Defines the backend service
+    image: pocker/backend:latest # The Docker image to use for the backend service
+    pull_policy: always # Ensures the latest image is always pulled
+    networks:
+      - poker-compose-network # Connects the service to the specified network
+    environment: # Environment variables for the backend service
+      - BACKEND_URL # The URL for the backend service
+    ports:
+      - "9191:9191" # Map host port 9191 to container port 9191
+    #depends_on:
+      #<another service or a database it depends on>: # Specifies service dependencies
+      #  condition: service_healthy # Waits for the dependent service to be healthy
+    #healthcheck: # Health check configuration for the service
+      #test: "curl --fail --silent <service url and port>/actuator/health | grep UP || exit 1" # Command to check service health
+      #interval: 10s # Time between running the health check
+      #timeout: 10s # Maximum time to allow the health check to run
+      #retries: 15 # Number of retries before considering the service unhealthy
+      #start_period: 30s # Initial grace period before starting health checks
+
+  frontend: # Defines the frontend service
+    image: poker/frontend:latest # The Docker image to use for the frontend service
+    pull_policy: always # Ensures the latest image is always pulled
+    networks:
+      - poker-compose-network # Connects the service to the specified network
+    environment: # Environment variables for the frontend service
+      - BACKEND_URL # The URL for the backend service
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000
+
+
+  nginx: # Defines the nginx service as a reverse proxy
+    image: nginx:1.25.3 # The Docker image to use for nginx
+    ports:
+     - "80:80" # Map host port 80 to container port 80 (NGINX default)
+    networks:
+      - poker-compose-network # Connects the service to the specified network
+    depends_on:
+      backend: # Specifies that nginx depends on the backend service
+        condition: service_healthy # Waits for the backend service to be healthy
+    environment: # Environment variables for the nginx service
+      - NGINX_PORT # The port nginx listens on
+      - FRONTEND_URL # The URL for the frontend service
+      - BACKEND_URL # The URL for the backend service
+
+  tomcat:
+    image: tomcat:latest
+    ports:
+      - "8080:8080" # Map host port 8080 to container port 8080
+
+networks:
+  poker-compose-network: # Defines the network used by the services
+    name: poker-compose-network # The name of the network
+
